@@ -1,7 +1,12 @@
 1.1:
   Added arguments for executables
   Executables are now run in a try loop. Because of that a bad executable will not crash SnakeOS anymore.
-
+  Added executable "examples.py":
+    SnakeOS examples.
+  Added new executable "argstemplate.py":
+    A template for executables using arguments.
+  Added new file "exec/args.txt":
+     Arguments are stored here.
 
 1.0:
   First version of SnakeOS
