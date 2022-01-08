@@ -1,0 +1,7 @@
+1.1:
+  Added arguments for executables
+  Executables are now run in a try loop. Because of that a bad executable will not crash SnakeOS anymore.
+
+
+1.0:
+  First version of SnakeOS
