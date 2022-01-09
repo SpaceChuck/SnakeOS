@@ -1,3 +1,9 @@
+CALC 1.0.1
+  Now raises a KeyboardInterrupt to exit
+
+1.1.1
+  Now catches KeyboardInterrupt while running executables. You can use "raise KeyboardInterrupt" to exit out of the program but not SnakeOS.
+
 1.1:
   Added arguments for executables
   Executables are now run in a try loop. Because of that a bad executable will not crash SnakeOS anymore.
