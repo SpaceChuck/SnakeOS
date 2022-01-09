@@ -1,7 +1,6 @@
 from math import *
 
 
-
 num1 = input("Number 1:")
 try: 
     num1 = int(num1)
@@ -9,7 +8,7 @@ except Exception:
     try:
         num1 = float(num1)
     except:
-        exit()
+        raise KeyboardInterrupt
 num2 = input("Number 2:")
 try:
     num2 = int(num2)
