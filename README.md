@@ -3,7 +3,7 @@ An OS made in Python
 
 Download this as a zip and run main.py
 
-Built-in Commands:
+# Built-in Commands:
 
 cd - change directory
 
@@ -19,7 +19,7 @@ del - delete a directory or a file
 
 
 
-Bundled Executables:
+# Bundled Executables:
 
 help - show help menu
 
