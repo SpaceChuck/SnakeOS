@@ -1,3 +1,7 @@
+1.2
+  Added plugins:
+    Plugins are executables that run at startup, on command or at shutdown. They are in the plugins folder. See plugin_template.py for more info.
+
 CALC 1.0.1
   Now raises a KeyboardInterrupt to exit
 
