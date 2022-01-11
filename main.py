@@ -3,7 +3,22 @@ import time
 import sys
 import shutil
 
-
+def quit():
+    print("\n")
+    print("Running shutdown plugins...")
+    for plugin in pluginsShutdown:
+        try:
+            exec(open(os.path.join("plugins", plugin)).read())
+        except Exception as e:
+            print("An exception has occured while running " + str(plugin))
+            print(e)
+        except KeyboardInterrupt:
+            continue
+    print("Shutting down SnakeOS...")
+    time.sleep(0.2)
+    print("Goodbye!")
+    time.sleep(0.8)
+    sys.exit()
 
 print("Starting SnakeOS...")
 print("Loading executables...")
@@ -14,10 +29,44 @@ try:
 except Exception:
     print("Failed while loading executables!")
 for i in executables:
-    if i == ".DS_Store":
+    if i.split(".")[1] == "py":
+        print("Found " + str(i).split(".")[0])
+
+try:
+    pluginsDir = os.listdir("plugins")
+    pluginsLoaded = True
+except Exception:
+    pluginsLoaded = False
+
+if pluginsLoaded:
+    print("Loading plugins...")
+    for i in pluginsDir:
+        if i.split(".")[1] == "py":
+            print("Found " + str(i).split(".")[0])
+
+pluginsStartup = [] 
+pluginsCommand = []
+pluginsShutdown = []
+
+for plugin in pluginsDir:
+    i = open(os.path.join("plugins",plugin), errors="replace")
+    firstline = i.readline(17)
+    if firstline == "# snakeos_runat 0":
+        pluginsStartup.append(plugin)
+    if firstline == "# snakeos_runat 1":
+        pluginsCommand.append(plugin)
+    if firstline == "# snakeos_runat 2":
+        pluginsShutdown.append(plugin)
+
+print("Running startup plugins...")
+for plugin in pluginsStartup:
+    try:
+        exec(open(os.path.join("plugins", plugin)).read())
+    except Exception as e:
+        print("An exception has occured while running " + str(plugin))
+        print(e)
+    except KeyboardInterrupt:
         continue
-    print("Found " + str(i).split(".")[0])
-    
 
 dir = "Home"
 
@@ -33,12 +82,15 @@ while True:
     except Exception:
         print("Bad command!")
     except KeyboardInterrupt:
-        print("\n")
-        print("Shutting down SnakeOS...")
-        time.sleep(0.2)
-        print("Goodbye!")
-        time.sleep(0.8)
-        sys.exit()
+        quit()
+    for plugin in pluginsCommand:
+        try:
+            exec(open(os.path.join("plugins", plugin)).read())
+        except Exception as e:
+            print("An exception has occured while running " + str(plugin))
+            print(e)
+        except KeyboardInterrupt:
+            continue
     cmd = command.split(" ")[0] + ".py"
     cmdargs = command.split(" ")
     cmdargs.append(" ")
@@ -62,12 +114,7 @@ while True:
             print(file)
 
     elif cmd == "quit.py" or cmd == "exit.py":
-        print("\n")
-        print("Shutting down SnakeOS...")
-        time.sleep(0.2)
-        print("Goodbye!")
-        time.sleep(0.8)
-        sys.exit()
+        quit()
     elif cmd == "make.py" or cmd == "mk.py":
         f = open(os.path.join(dir, command.split(" ")[1]), "x")
         f = 0
@@ -81,6 +128,20 @@ while True:
                 os.remove(os.path.join(dir, command.split(" ")[1]))
             except Exception:
                 print("Unknown file/directory!")
+    elif cmd == "edit.py":
+        try:
+            edit_file = open(command.split(" ")[1], "w")
+        except Exception:
+            print("File not found!")
+            break
+        edit_string = "" 
+        for line in command.split(" ")[2:]:
+            edit_string += line + " "
+        try:
+            edit_file.write(edit_string)
+        except:
+            print("Couldn't write to file!")
+        edit_file.close()
     elif cmd in executables:
         for i in range(2): # Required because of my garbage coding. It writes on the second try.
             arguments = open(os.path.join("exec", "args.txt"),"w").close()
