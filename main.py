@@ -3,6 +3,16 @@ import time
 import sys
 import shutil
 
+
+if os.path.join("t","i")[1] == "\\":
+    winMode = True
+else:
+    try:
+        open("WinMode") # Create an empty file called "WinMode" (no extension) to enable Windows Mode
+        winMode = True
+    except Exception:
+        winMode = False
+
 def quit():
     print("\n")
     print("Running shutdown plugins...")
@@ -20,7 +30,19 @@ def quit():
     time.sleep(0.8)
     sys.exit()
 
+def convertPathToWin(path):
+    newPath = ""
+    for i in path:
+        if i == "/":
+            newI = "\\"
+        else:
+            newI = i
+        newPath += newI
+    return newPath
+
 print("Starting SnakeOS...")
+if winMode:
+    print("Running under Windows, some problems with paths might occur!")
 print("Loading executables...")
 executables = 0
 
@@ -69,6 +91,7 @@ for plugin in pluginsStartup:
         continue
 
 dir = "Home"
+dirDisplay = "—"
 
 print("Welcome to SnakeOS!")
 if "help.py" in executables:
@@ -78,7 +101,7 @@ else:
 
 while True:
     try:
-        command = input(dir + ">>")
+        command = input(dirDisplay + ">>")
     except Exception:
         print("Bad command!")
     except KeyboardInterrupt:
@@ -97,12 +120,43 @@ while True:
     cmdargs = cmdargs[1:-1]
     if cmd == "cd.py":
         dirTemp = command.split(" ")[1]
+        if command.split(" ")[1] == "-" or command.split(" ")[1] == "—":
+            dir = "Home"
+            dirDisplay = "—"
+        elif command.split(" ")[1] == "*":
+            dir = os.getcwd()
+            dirDisplay = "*"
+        else:
+            if dirTemp[0:2] == "*/" or command.split(" ")[0:2] == "*\\":
+                dirTemp = dirTemp[2:len(dirTemp)]
+            elif dirTemp[0:2] == "-/" or command.split(" ")[0:2] == "-\\":
+                dirTemp = dirTemp[2:len(dirTemp)]
+            try:
+                if winMode:
+                    os.listdir(os.path.join(convertPathToWin(dir),convertPathToWin(dirTemp)))
+                else:
+                    dirTemp = os.path.join(dir,dirTemp) 
+            except Exception:
+                try:
+                    if winMode:
+                        os.listdir(convertPathToWin(dirTemp)) # Used to check if a directory exists
+                    else:
+                        os.listdir(dirTemp) # Used to check if a directory exists
+                except Exception:
+                    print("Unknown directory!")
+                    continue
+            if winMode:
+                dir = convertPathToWin(dirTemp)
+            else:
+                dir = dirTemp
+            dirDisplay = "*/" + dir
         try:
-            os.listdir(dirTemp) # Used to check if a directory exists
+            if dirDisplay == "Home":
+                dirDisplay = "—"
+            elif dirDisplay.split("/")[0] == "*" and dirDisplay.split("/")[1] == "Home" or dirDisplay.split("/")[1] == "home":
+                dirDisplay = "—" + dirDisplay[6:len(dirDisplay)]
         except Exception:
-            print("Unknown directory!")
             continue
-        dir = dirTemp
     elif cmd == "ls.py" or cmd == "list.py":
         try:
             listDir = os.listdir(dir)
@@ -116,7 +170,8 @@ while True:
     elif cmd == "quit.py" or cmd == "exit.py":
         quit()
     elif cmd == "make.py" or cmd == "mk.py":
-        f = open(os.path.join(dir, command.split(" ")[1]), "x")
+        file = command.split(" ")[1]
+        f = open(os.path.join(dir, file), "x")
         f = 0
     elif cmd == "makedir.py" or cmd == "makedir.py":
         os.mkdir(os.path.join(dir, command.split(" ")[1]))
