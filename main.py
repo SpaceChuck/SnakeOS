@@ -89,11 +89,75 @@ for plugin in pluginsStartup:
         print(e)
     except KeyboardInterrupt:
         continue
+users = []
+for user in os.listdir("Home"):
+    if user.lower() == ".ds_store":
+        continue
+    users.append(user.lower())
+if users == [] or users == ["admin"]:
+    print("Welcome to SnakeOS setup!")
+    print("Setup will help you create a user and set an administrator password.")
+    username = input("Username:")
+    os.mkdir(os.path.join("Home", username))
+    password = input("Password:")
+    if password == "":
+        print("You entered a blank password, that's not secure!")
+        answer = input("Do you really want to continue? (Y/N):").lower()
+        if answer == "n":
+            sys.exit()
+    else:
+        passwordtxt = open(os.path.join("Home", username,".password"),"w")
+        passwordtxt.write(password)
+        passwordtxt.close()
+    print("TIP: You can add more users with the 'useradd' command.")
+    print("Now we need to add an administrator password, otherwise people will be able to login as 'admin' and have full acess to the system.")
+    try:
+        os.mkdir(os.path.join("Home", "admin"))
+    except Exception:
+        1+1
+    password = input("Password:")
+    if password == "":
+        print("You entered a blank password, that's not secure!")
+        answer = input("Do you really want to continue? (Y/N):").lower()
+        if answer == "n":
+            sys.exit()
+    else:
+        passwordtxt = open(os.path.join("Home", "admin",".password"),"w")
+        passwordtxt.write(password)
+        passwordtxt.close()
 
-dir = "Home"
+print("Login to SnakeOS")
+while True:
+    print("Type 'list' to list users or 'quit' to exit")
+    username = input("Username:")
+    if username != "list" and username != "quit" and not username in users:
+        print("User doesn't exist!")
+        continue
+    if username == "list":
+        for user in users:
+            if user != "admin" and user != ".ds_store":
+                print(user)
+        continue
+    if username == "quit":
+        quit()
+    try:
+        passwordtxt = open(os.path.join("Home", username,".password"),"r")
+    except FileNotFoundError:
+        home = os.path.join("Home", username)
+        break
+    password = input("Password:")
+    if passwordtxt.readlines()[0] != password:
+        print("Wrong password!")
+        passwordtxt.close()
+        continue
+    passwordtxt.close()
+    home = os.path.join("Home", username)
+    break
+
+dir = home
 dirDisplay = "—"
 
-print("Welcome to SnakeOS!")
+print("Welcome to SnakeOS, " + username + "!")
 if "help.py" in executables:
     print("Type 'help' To get help.")
 else:
@@ -121,7 +185,7 @@ while True:
     if cmd == "cd.py":
         dirTemp = command.split(" ")[1]
         if command.split(" ")[1] == "-" or command.split(" ")[1] == "—":
-            dir = "Home"
+            dir = os.path.join("Home",username)
             dirDisplay = "—"
         elif command.split(" ")[1] == "*":
             dir = os.getcwd()
@@ -134,8 +198,10 @@ while True:
             try:
                 if winMode:
                     os.listdir(os.path.join(convertPathToWin(dir),convertPathToWin(dirTemp)))
+                    dirTemp = os.path.join(convertPathToWin(dir),convertPathToWin(dirTemp))
                 else:
-                    dirTemp = os.path.join(dir,dirTemp) 
+                    os.listdir(os.path.join(dir,dirTemp))
+                    dirTemp = os.path.join(dir,dirTemp)
             except Exception:
                 try:
                     if winMode:
@@ -151,10 +217,11 @@ while True:
                 dir = dirTemp
             dirDisplay = "*/" + dir
         try:
-            if dirDisplay == "Home":
+            if dirDisplay == os.path.join("*","Home",username):
                 dirDisplay = "—"
             elif dirDisplay.split("/")[0] == "*" and dirDisplay.split("/")[1] == "Home" or dirDisplay.split("/")[1] == "home":
-                dirDisplay = "—" + dirDisplay[6:len(dirDisplay)]
+                if dirDisplay.split("/")[2] == username:
+                    dirDisplay = "—" + dirDisplay[7 + len(username):len(dirDisplay)]
         except Exception:
             continue
     elif cmd == "ls.py" or cmd == "list.py":
