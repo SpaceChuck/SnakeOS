@@ -1,3 +1,8 @@
+1.4
+  Added users
+    You can create one using the setup assistant or with useradd.
+    You can change someone's password using passwd.
+
 1.3
   Changed cd:
     Now you can use "*" to go to root
