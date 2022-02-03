@@ -17,6 +17,7 @@ makedir - make a directory
 
 del - delete a directory or a file
 
+edit - edit a file
 
 
 # Bundled Executables:
@@ -26,6 +27,10 @@ help - show help menu
 calc - calculator
 
 examples - SnakeOS examples
+
+passwd - change a user's password
+
+useradd - add a user
 
 
 https://spacechucksblog.blogspot.com/2022/01/snakeos.html
