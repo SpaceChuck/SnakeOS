@@ -1,3 +1,7 @@
+1.5
+  Added comments to the source code
+  Now exit logs off instead of shutting down. You can type quit on the login screen to shutdown.
+
 1.4
   Added users
     You can create one using the setup assistant or with useradd.
