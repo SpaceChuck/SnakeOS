@@ -12,6 +12,11 @@ for i in argsTemp:
 if args != []:
     try:
         username = args[0]
+        if username == "list" or username == "quit":
+            print("You cannot make an account called list or quit!")
+            raise KeyboardInterrupt
+        else:
+            os.mkdir(os.path.join("Home", username))
         password = args[1]
         os.mkdir(os.path.join("Home", username))
         if password == "":
@@ -25,7 +30,11 @@ if args != []:
             passwordtxt.close()
     except Exception:
         username = args[0]
-        os.mkdir(os.path.join("Home", username))
+        if username == "list" or username == "quit":
+            print("You cannot make an account called list or quit!")
+            raise KeyboardInterrupt
+        else:
+            os.mkdir(os.path.join("Home", username))
         password = input("Password:")
         if password == "":
             print("You entered a blank password, that's not secure!")
@@ -38,7 +47,11 @@ if args != []:
             passwordtxt.close()
 else:
     username = input("Username:")
-    os.mkdir(os.path.join("Home", username))
+    if username == "list" or username == "quit":
+        print("You cannot make an account called list or quit!")
+        raise KeyboardInterrupt
+    else:
+        os.mkdir(os.path.join("Home", username))
     password = input("Password:")
     if password == "":
         print("You entered a blank password, that's not secure!")
