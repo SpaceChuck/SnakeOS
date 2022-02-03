@@ -1,3 +1,6 @@
+HELP 1.0.1
+   Now lists "edit"
+
 USERADD 1.0.1
    No longer allows you to create an account named "list" or "quit"
 
