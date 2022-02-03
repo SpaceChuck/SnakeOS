@@ -4,6 +4,8 @@ import sys
 import shutil
 
 
+## Windows Mode
+
 if os.path.join("t","i")[1] == "\\":
     winMode = True
 else:
@@ -13,6 +15,7 @@ else:
     except Exception:
         winMode = False
 
+## Shutdown SnakeOS
 def quit():
     print("\n")
     print("Running shutdown plugins...")
@@ -30,6 +33,7 @@ def quit():
     time.sleep(0.8)
     sys.exit()
 
+## Convert path to Windows format (using backslashes)
 def convertPathToWin(path):
     newPath = ""
     for i in path:
@@ -40,12 +44,63 @@ def convertPathToWin(path):
         newPath += newI
     return newPath
 
+def login():
+    print("Login to SnakeOS")
+    while True:
+        print("Type 'list' to list users or 'quit' to exit")
+        username = input("Username:")
+        if username != "list" and username != "quit" and not username in users:
+            print("User doesn't exist!")
+            continue
+        if username == "list":
+            for user in users:
+                if user != "admin" and user != ".ds_store":
+                    print(user)
+            continue
+        if username == "quit":
+            quit()
+        try:
+            passwordtxt = open(os.path.join("Home", username,".password"),"r")
+        except FileNotFoundError:
+            home = os.path.join("Home", username)
+            break
+        password = input("Password:")
+        if passwordtxt.readlines()[0] != password:
+            print("Wrong password!")
+            passwordtxt.close()
+            continue
+        passwordtxt.close()
+        home = os.path.join("Home", username)
+        dir = home
+        dirDisplay = "—"
+        break
+    print("Running login plugins...")
+    try:
+        for plugin in pluginsLogin:
+            try:
+                exec(open(os.path.join("plugins", plugin)).read())
+            except Exception as e:
+                print("An exception has occured while running " + str(plugin))
+                print(e)
+            except KeyboardInterrupt:
+                continue
+    except Exception:
+        1+1
+    print("Welcome to SnakeOS, " + username + "!")
+    if "help.py" in executables:
+        print("Type 'help' To get help.")
+    else:
+        print("'help' is not found!")
+    return [home,username]
+
+
+## Start SnakeOS
 print("Starting SnakeOS...")
 if winMode:
     print("Running under Windows, some problems with paths might occur!")
+## Load executables
 print("Loading executables...")
-executables = 0
-
+executables = []
 try:
     executables = os.listdir("exec")
 except Exception:
@@ -54,22 +109,22 @@ for i in executables:
     if i.split(".")[1] == "py":
         print("Found " + str(i).split(".")[0])
 
+## Load plugins
 try:
     pluginsDir = os.listdir("plugins")
     pluginsLoaded = True
 except Exception:
     pluginsLoaded = False
-
 if pluginsLoaded:
     print("Loading plugins...")
     for i in pluginsDir:
         if i.split(".")[1] == "py":
             print("Found " + str(i).split(".")[0])
-
 pluginsStartup = [] 
 pluginsCommand = []
 pluginsShutdown = []
-
+pluginsLogin = []
+pluginsLogoff = []
 for plugin in pluginsDir:
     i = open(os.path.join("plugins",plugin), errors="replace")
     firstline = i.readline(17)
@@ -79,7 +134,13 @@ for plugin in pluginsDir:
         pluginsCommand.append(plugin)
     if firstline == "# snakeos_runat 2":
         pluginsShutdown.append(plugin)
+    if firstline == "# snakeos_runat 3":
+        pluginsLogin.append(plugin)
+    if firstline == "# snakeos_runat 4":
+        pluginsLogoff.append(plugin)
 
+
+## Run startup plugins
 print("Running startup plugins...")
 for plugin in pluginsStartup:
     try:
@@ -89,16 +150,24 @@ for plugin in pluginsStartup:
         print(e)
     except KeyboardInterrupt:
         continue
+
+## List users
 users = []
 for user in os.listdir("Home"):
     if user.lower() == ".ds_store":
         continue
     users.append(user.lower())
+
+## Setup
 if users == [] or users == ["admin"]:
     print("Welcome to SnakeOS setup!")
     print("Setup will help you create a user and set an administrator password.")
     username = input("Username:")
-    os.mkdir(os.path.join("Home", username))
+    if username == "list" or username == "quit":
+        print("You cannot make an account called list or quit!")
+        sys.exit()
+    else:
+        os.mkdir(os.path.join("Home", username))
     password = input("Password:")
     if password == "":
         print("You entered a blank password, that's not secure!")
@@ -126,50 +195,24 @@ if users == [] or users == ["admin"]:
         passwordtxt.write(password)
         passwordtxt.close()
 
-print("Login to SnakeOS")
-while True:
-    print("Type 'list' to list users or 'quit' to exit")
-    username = input("Username:")
-    if username != "list" and username != "quit" and not username in users:
-        print("User doesn't exist!")
-        continue
-    if username == "list":
-        for user in users:
-            if user != "admin" and user != ".ds_store":
-                print(user)
-        continue
-    if username == "quit":
-        quit()
-    try:
-        passwordtxt = open(os.path.join("Home", username,".password"),"r")
-    except FileNotFoundError:
-        home = os.path.join("Home", username)
-        break
-    password = input("Password:")
-    if passwordtxt.readlines()[0] != password:
-        print("Wrong password!")
-        passwordtxt.close()
-        continue
-    passwordtxt.close()
-    home = os.path.join("Home", username)
-    break
 
-dir = home
+## Login screen
+loginResults = login()
+dir = loginResults[0]
+username = loginResults[1]
 dirDisplay = "—"
 
-print("Welcome to SnakeOS, " + username + "!")
-if "help.py" in executables:
-    print("Type 'help' To get help.")
-else:
-    print("'help' is not found!")
-
+## Loop
 while True:
+    ## Command input
     try:
         command = input(dirDisplay + ">>")
-    except Exception:
+    except Exception as e:
         print("Bad command!")
+        print(e)
     except KeyboardInterrupt:
         quit()
+    ## On command plugins
     for plugin in pluginsCommand:
         try:
             exec(open(os.path.join("plugins", plugin)).read())
@@ -178,10 +221,12 @@ while True:
             print(e)
         except KeyboardInterrupt:
             continue
+    ## Variables
     cmd = command.split(" ")[0] + ".py"
     cmdargs = command.split(" ")
     cmdargs.append(" ")
     cmdargs = cmdargs[1:-1]
+    ## cd command
     if cmd == "cd.py":
         dirTemp = command.split(" ")[1]
         if command.split(" ")[1] == "-" or command.split(" ")[1] == "—":
@@ -224,6 +269,7 @@ while True:
                     dirDisplay = "—" + dirDisplay[7 + len(username):len(dirDisplay)]
         except Exception:
             continue
+    ## ls command
     elif cmd == "ls.py" or cmd == "list.py":
         try:
             listDir = os.listdir(dir)
@@ -233,16 +279,30 @@ while True:
 
         for file in listDir:
             print(file)
-
-    elif cmd == "quit.py" or cmd == "exit.py":
-        quit()
+    ## quit command
+    elif cmd == "quit.py" or cmd == "exit.py" or cmd == "logoff.py" or cmd == "logout.py":
+        print("Running logoff plugins...")
+        for plugin in pluginsLogoff:
+            try:
+                exec(open(os.path.join("plugins", plugin)).read())
+            except Exception as e:
+                print("An exception has occured while running " + str(plugin))
+                print(e)
+            except KeyboardInterrupt:
+                continue
+        print("Logged off " + username)
+        dir = login()[0]
+        dirDisplay = "—"
+    ## make command
     elif cmd == "make.py" or cmd == "mk.py":
         file = command.split(" ")[1]
         f = open(os.path.join(dir, file), "x")
         f = 0
-    elif cmd == "makedir.py" or cmd == "makedir.py":
+    ## makedir command
+    elif cmd == "makedir.py" or cmd == "mkdir.py":
         os.mkdir(os.path.join(dir, command.split(" ")[1]))
-    elif cmd == "del.py" or cmd == "delete.py" or cmd == "del.py" or cmd == "delete.py":
+    ## del command
+    elif cmd == "del.py" or cmd == "delete.py" or cmd == "rm.py" or cmd == "remove.py":
         try:
             shutil.rmtree(os.path.join(dir, command.split(" ")[1]))
         except Exception:
@@ -250,6 +310,7 @@ while True:
                 os.remove(os.path.join(dir, command.split(" ")[1]))
             except Exception:
                 print("Unknown file/directory!")
+    ## edit command
     elif cmd == "edit.py":
         try:
             edit_file = open(command.split(" ")[1], "w")
@@ -283,6 +344,7 @@ while True:
             print("An error has occured while running " + cmd)
             print(e)
         except KeyboardInterrupt:
+            print("\n")
             continue
     else:
         print("Bad command!")
