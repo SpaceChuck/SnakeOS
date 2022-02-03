@@ -1,5 +1,6 @@
 1.5
   Added comments to the source code
+  The setup assistant no longer allows you to create an account named "list" or "quit".
   Now exit logs off instead of shutting down. You can type quit on the login screen to shutdown.
 
 1.4
