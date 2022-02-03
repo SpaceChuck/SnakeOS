@@ -9,6 +9,7 @@ quit - shutdown SnakeOS
 make - make a file
 makedir - make a directory
 del - delete a directory or a file
+edit - edit a file
 
  """)
 
