@@ -1,3 +1,6 @@
+1.6.1
+   Now scans for new executables before every command, so you won't have to restart when you install an executable
+
 ARGSTEMPLATE 1.0.1
    Now reads info.txt
 
