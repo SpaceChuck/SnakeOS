@@ -1,3 +1,13 @@
+1.6
+   Now writes the currently used account, working directory and displayed directory to exec/info.txt
+   Added executable "pip.py"
+      Allows you to use pip from SnakeOS, useful for apps that need dependencies
+   Added executable "spkg.py"
+      The SnakeOS package manager
+      Install with "spkg install <package>"
+      Uninstall with "spkg uninstall <package>"
+      Uses repo at https://github.com/SpaceChuck/spkg-repo
+
 HELP 1.0.1
    Now lists "edit"
 
