@@ -13,17 +13,6 @@ for i in argsTemp:
     else:
         args.append(i[0:-1])
 
-infofile = open(os.path.join("exec", "info.txt"), "r")
-infoTemp = infofile.readlines()
-info = []
-for i in infoTemp:
-    if i == infoTemp[len(infoTemp)-1]:
-        info.append(i)
-    else:
-        info.append(i[0:-1])
-username = info[0]
-dir = info[1]
-
 if args[0] == "install":
     url = "https://raw.githubusercontent.com/SpaceChuck/spkg-repo/main/" + args[1] + "/install.py"
     print("Downloading install script from: " + url + "...")
@@ -79,8 +68,3 @@ else:
         spkg install <package> - install a package
         spkg uninstall <package> - uninstall a package
     """)
-
-
-
-
-
