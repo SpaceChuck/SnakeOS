@@ -210,6 +210,7 @@ dirDisplay = "—"
 
 ## Loop
 while True:
+    executables = os.listdir("exec")
     ## Command input
     try:
         command = input(username + "@" + dirDisplay + ">>")
