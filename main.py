@@ -106,8 +106,11 @@ try:
 except Exception:
     print("Failed while loading executables!")
 for i in executables:
-    if i.split(".")[1] == "py":
-        print("Found " + str(i).split(".")[0])
+    try:
+        if i.split(".")[1] == "py":
+            print("Found " + str(i).split(".")[0])
+    except:
+        continue
 
 ## Load plugins
 try:
@@ -197,7 +200,10 @@ if users == [] or users == ["admin"]:
 
 
 ## Login screen
-loginResults = login()
+try:
+    loginResults = login()
+except KeyboardInterrupt:
+    quit()
 dir = loginResults[0]
 username = loginResults[1]
 dirDisplay = "—"
@@ -206,7 +212,7 @@ dirDisplay = "—"
 while True:
     ## Command input
     try:
-        command = input(dirDisplay + ">>")
+        command = input(username + "@" + dirDisplay + ">>")
     except Exception as e:
         print("Bad command!")
         print(e)
@@ -228,7 +234,11 @@ while True:
     cmdargs = cmdargs[1:-1]
     ## cd command
     if cmd == "cd.py":
-        dirTemp = command.split(" ")[1]
+        try:
+            dirTemp = command.split(" ")[1]
+        except Exception:
+            print("Bad command!")
+            continue
         if command.split(" ")[1] == "-" or command.split(" ")[1] == "—":
             dir = os.path.join("Home",username)
             dirDisplay = "—"
@@ -291,7 +301,12 @@ while True:
             except KeyboardInterrupt:
                 continue
         print("Logged off " + username)
-        dir = login()[0]
+        try:
+            loginResults = login()
+        except KeyboardInterrupt:
+            quit()
+        dir = loginResults[0]
+        username = loginResults[1]
         dirDisplay = "—"
     ## make command
     elif cmd == "make.py" or cmd == "mk.py":
@@ -338,6 +353,16 @@ while True:
                 else:
                     arguments.write("\n" + str(i))
             arguments.close()
+        for i in range(2): # Required because of my garbage coding. It writes on the second try.
+            info = open(os.path.join("exec", "info.txt"),"w").close()
+            infolist = [username,dir,dirDisplay]
+            information = open(os.path.join("exec", "info.txt"),"a")
+            for i in infolist:
+                if i == infolist[0]:
+                    information.write(str(i))
+                else:
+                    information.write("\n" + str(i))
+            information.close()
         try:
             exec(open(os.path.join("exec", command.split(" ")[0] + ".py")).read())
         except Exception as e:
