@@ -1,3 +1,6 @@
+ARGSTEMPLATE 1.0.1
+   Now reads info.txt
+
 1.6
    Now writes the currently used account, working directory and displayed directory to exec/info.txt
    Added executable "pip.py"
