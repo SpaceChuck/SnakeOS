@@ -1,3 +1,10 @@
+1.7
+   Now actively checks for new users, so you won't have to restart after adding a new user
+   Now only directories count as a user
+   Now has groups:
+      Groups are lists of users. They can be used to add or remove a user's privileges.
+      Edit them in Home/groups.py
+
 1.6.1
    Now scans for new executables before every command, so you won't have to restart when you install an executable
 
