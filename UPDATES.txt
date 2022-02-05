@@ -1,3 +1,13 @@
+PASSWD 1.1
+   Now only allows administrators to change another user's password
+   Non-administrator users can still change their own passwords
+
+SPKG 1.1
+   Now only allows administrators to install executables
+
+USERADD 1.2
+   Now only allows administrators to add users
+
 1.7
    Now actively checks for new users, so you won't have to restart after adding a new user
    Now only directories count as a user
