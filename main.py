@@ -43,8 +43,12 @@ def convertPathToWin(path):
             newI = i
         newPath += newI
     return newPath
-
+## Login Screen
 def login():
+    users = []
+    for user in os.listdir("Home"):
+        if os.path.isdir(os.path.join("Home",user)) and not user.lower() == ".ds_store":
+            users.append(user.lower())
     print("Login to SnakeOS")
     while True:
         print("Type 'list' to list users or 'quit' to exit")
@@ -54,7 +58,7 @@ def login():
             continue
         if username == "list":
             for user in users:
-                if user != "admin" and user != ".ds_store":
+                if not user in groups.get("Hidden") and user != ".ds_store":
                     print(user)
             continue
         if username == "quit":
@@ -91,7 +95,7 @@ def login():
         print("Type 'help' To get help.")
     else:
         print("'help' is not found!")
-    return [home,username]
+    return [home,username,users]
 
 
 ## Start SnakeOS
@@ -157,9 +161,8 @@ for plugin in pluginsStartup:
 ## List users
 users = []
 for user in os.listdir("Home"):
-    if user.lower() == ".ds_store":
-        continue
-    users.append(user.lower())
+    if os.path.isdir(os.path.join("Home",user)) and not user.lower() == ".ds_store":
+        users.append(user.lower())
 
 ## Setup
 if users == [] or users == ["admin"]:
@@ -200,19 +203,25 @@ if users == [] or users == ["admin"]:
 
 
 ## Login screen
+groups = {}
+exec(open(os.path.join("Home","groups.py")).read())
 try:
     loginResults = login()
 except KeyboardInterrupt:
     quit()
 dir = loginResults[0]
 username = loginResults[1]
+users = loginResults[2]
 dirDisplay = "—"
 
 ## Loop
 while True:
+    groups = {}
+    exec(open(os.path.join("Home","groups.py")).read())
     executables = os.listdir("exec")
     ## Command input
     try:
+        username = loginResults[1]
         command = input(username + "@" + dirDisplay + ">>")
     except Exception as e:
         print("Bad command!")
@@ -235,6 +244,8 @@ while True:
     cmdargs = cmdargs[1:-1]
     ## cd command
     if cmd == "cd.py":
+        dirDisplayOld = dirDisplay
+        dirOld = dir
         try:
             dirTemp = command.split(" ")[1]
         except Exception:
@@ -271,7 +282,16 @@ while True:
                 dir = convertPathToWin(dirTemp)
             else:
                 dir = dirTemp
-            dirDisplay = "*/" + dir
+                dirDisplay = "*/" + dir
+        try:
+            if not username in groups.get("Administrators") and dir[0:5 + len(username)] != "Home/" + username:
+                print("You don't have the privileges to go to this directory!")
+                dir = dirOld
+                dirDisplay = dirDisplayOld
+        except Exception:
+            print("You don't have the privileges to go to this directory!")
+            dir = dirOld
+            dirDisplay = dirDisplayOld
         try:
             if dirDisplay == os.path.join("*","Home",username):
                 dirDisplay = "—"
@@ -308,8 +328,10 @@ while True:
             quit()
         dir = loginResults[0]
         username = loginResults[1]
+        users = loginResults[2]
         dirDisplay = "—"
     ## make command
+
     elif cmd == "make.py" or cmd == "mk.py":
         file = command.split(" ")[1]
         f = open(os.path.join(dir, file), "x")
@@ -329,6 +351,13 @@ while True:
     ## edit command
     elif cmd == "edit.py":
         try:
+            if not username in groups.get("Administrators") and command.split(" ")[1][0:5 + len(username)] != "Home/" + username:
+                print("You don't have the privileges to edit this file!")
+                continue
+        except Exception:
+            print("You don't have the privileges to go to edit this file!")
+            continue
+        try:
             edit_file = open(command.split(" ")[1], "w")
         except Exception:
             print("File not found!")
@@ -342,6 +371,9 @@ while True:
             print("Couldn't write to file!")
         edit_file.close()
     elif cmd in executables:
+        if username in groups.get("Limited"):
+            print("You cannot execute files!")
+            continue
         for i in range(2): # Required because of my garbage coding. It writes on the second try.
             arguments = open(os.path.join("exec", "args.txt"),"w").close()
             cmdargs = command.split(" ")
