@@ -12,6 +12,26 @@ for i in argsTemp:
         args.append(i)
     else:
         args.append(i[0:-1])
+try:
+    infofile = open(os.path.join("exec", "info.txt"), "r")
+    infoTemp = infofile.readlines()
+    info = []
+    for i in infoTemp:
+        if i == infoTemp[len(infoTemp)-1]:
+            info.append(i)
+        else:
+            info.append(i[0:-1])
+    username = info[0]
+    dir = info[1]
+    try:
+        exec(open(os.path.join("Home","groups.py"),"r").read())
+        if not username in groups.get("Administrators"):
+            print("You cannot install software!")
+            raise KeyboardInterrupt
+    except FileNotFoundError:
+        pass
+except FileNotFoundError:
+    pass
 
 if args[0] == "install":
     url = "https://raw.githubusercontent.com/SpaceChuck/spkg-repo/main/" + args[1] + "/install.py"
@@ -68,3 +88,8 @@ else:
         spkg install <package> - install a package
         spkg uninstall <package> - uninstall a package
     """)
+
+
+
+
+

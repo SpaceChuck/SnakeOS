@@ -8,10 +8,24 @@ for i in argsTemp:
         args.append(i)
     else:
         args.append(i[0:-1])
-
+infofile = open(os.path.join("exec", "info.txt"), "r")
+infoTemp = infofile.readlines()
+info = []
+for i in infoTemp:
+    if i == infoTemp[len(infoTemp)-1]:
+        info.append(i)
+    else:
+        info.append(i[0:-1])
+user = info[0]
+dir = info[1]
+#groups = {}
+exec(open(os.path.join("Home","groups.py"),"r").read())
 if args != []:
     try:
         username = args[0]
+        if not user in groups.get("Administrators") and user != username:
+            print("You cannot change the password of other users!")
+            raise KeyboardInterrupt
         password = args[1]
         if password == "":
             print("You entered a blank password, that's not secure!")
@@ -24,6 +38,9 @@ if args != []:
             passwordtxt.close()
     except Exception:
         username = args[0]
+        if not user in groups.get("Administrators") and user != username:
+            print("You cannot change the password of other users!")
+            raise KeyboardInterrupt
         password = input("Password:")
         if password == "":
             print("You entered a blank password, that's not secure!")
@@ -36,6 +53,9 @@ if args != []:
             passwordtxt.close()
 else:
     username = input("Username:")
+    if not user in groups.get("Administrators") and user != username:
+        print("You cannot change the password of other users!")
+        raise KeyboardInterrupt
     password = input("Password:")
     if password == "":
         print("You entered a blank password, that's not secure!")

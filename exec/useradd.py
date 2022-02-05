@@ -9,15 +9,29 @@ for i in argsTemp:
     else:
         args.append(i[0:-1])
 
+infofile = open(os.path.join("exec", "info.txt"), "r")
+infoTemp = infofile.readlines()
+info = []
+for i in infoTemp:
+    if i == infoTemp[len(infoTemp)-1]:
+        info.append(i)
+    else:
+        info.append(i[0:-1])
+    username = info[0]
+exec(open(os.path.join("Home","groups.py"),"r").read())
+if not username in groups.get("Administrators"):
+    print("You cannot add users!")
+    raise KeyboardInterrupt
+
 if args != []:
     try:
         username = args[0]
+        password = args[1]
         if username == "list" or username == "quit":
             print("You cannot make an account called list or quit!")
             raise KeyboardInterrupt
         else:
             os.mkdir(os.path.join("Home", username))
-        password = args[1]
         os.mkdir(os.path.join("Home", username))
         if password == "":
             print("You entered a blank password, that's not secure!")
